@@ -55,7 +55,7 @@ app.get('/abacatepay/v1/pixQrCode/check', async (req, res) => {
   delete forwardedHeaders['content-length'];
 
   try {
-    const delayOptions = [7000, 8000, 9000, 10000];
+    const delayOptions = [5000, 3000, 4000];
     const selectedDelay = delayOptions[Math.floor(Math.random() * delayOptions.length)];
 
     await new Promise(resolve => setTimeout(resolve, selectedDelay));
