@@ -41,20 +41,21 @@ app.post('/abacatepay', async (req, res) => {
 
 
 app.get('/abacatepay/v1/pixQrCode/check', async (req, res) => {
-  const { id, token } = req.query;
+  const { id } = req.query;
 
   if (!id || !token) {
     return res.status(400).json({ error: 'ID da transação não informado' });
   }
-
-
+  const forwardedHeaders = {
+    ...req.headers,
+    'Content-Type': 'application/json',
+  };
+  delete forwardedHeaders['host'];
+  delete forwardedHeaders['content-length'];
   try {
     const response = await fetch(`https://api.abacatepay.com/v1/pixQrCode/check?id=${id}`, {
       method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
+      headers: forwardedHeaders,
     });
 
     const contentType = response.headers.get('content-type') || '';
