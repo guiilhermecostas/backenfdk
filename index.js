@@ -55,7 +55,7 @@ app.get('/abacatepay/v1/pixQrCode/check', async (req, res) => {
   delete forwardedHeaders['content-length'];
 
   try {
-    const randomDelay = () => Math.floor(Math.random() * (1000 - 100 + 1)) + 100;
+    const randomDelay = () => Math.floor(Math.random() * (5000 - 100 + 1)) + 100;
 
     await new Promise(resolve => setTimeout(resolve, randomDelay()));
 
