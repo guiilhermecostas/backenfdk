@@ -46,18 +46,23 @@ app.get('/abacatepay/v1/pixQrCode/check', async (req, res) => {
   if (!id) {
     return res.status(400).json({ error: 'ID da transação não informado' });
   }
+
   const forwardedHeaders = {
     ...req.headers,
     'Content-Type': 'application/json',
   };
   delete forwardedHeaders['host'];
   delete forwardedHeaders['content-length'];
+
   try {
+    const randomDelay = () => Math.floor(Math.random() * (1000 - 100 + 1)) + 100;
+
+    await new Promise(resolve => setTimeout(resolve, randomDelay()));
+
     const response = await fetch(`https://api.abacatepay.com/v1/pixQrCode/check?id=${id}`, {
       method: 'GET',
       headers: forwardedHeaders,
     });
-
 
     const result = await response.json();
 
@@ -67,7 +72,6 @@ app.get('/abacatepay/v1/pixQrCode/check', async (req, res) => {
     res.status(500).json({ error: 'Erro ao checar status do pagamento' });
   }
 });
-
 
 app.listen(PORT, () => {
   console.log(`🚀 Backend rodando em http://localhost:${PORT}`);
