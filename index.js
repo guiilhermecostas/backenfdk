@@ -34,6 +34,7 @@ app.post('/abacatepay', async (req, res) => {
   }
 });
 
+// ✅ Rota para checar status do PIX
 app.get('/abacatepay/v1/pixQrCode/check', async (req, res) => {
   const { id } = req.query;
 
@@ -74,4 +75,9 @@ app.get('/abacatepay/v1/pixQrCode/check', async (req, res) => {
     console.error('Erro ao checar status na AbacatePay:', err.message || err);
     res.status(500).json({ error: 'Erro ao checar status do pagamento' });
   }
+});
+
+
+app.listen(PORT, () => {
+  console.log(`🚀 Backend rodando em http://localhost:${PORT}`);
 });
