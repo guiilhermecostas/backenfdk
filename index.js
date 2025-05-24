@@ -14,15 +14,20 @@ app.get('/', (req, res) => {
   res.send('🚀 Backend AbacatePay está rodando!');
 });
 
-// Rota para criar pagamento (se necessário futuramente)
+
 app.post('/abacatepay', async (req, res) => {
   try {
+    const forwardedHeaders = {
+      ...req.headers,
+      'Content-Type': 'application/json',
+    };
+
+    delete forwardedHeaders['host'];
+    delete forwardedHeaders['content-length'];
+
     const response = await fetch('https://api.abacatepay.com/v1/pixQrCode/create', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.ABACATEPAY_TOKEN}`,
-        'Content-Type': 'application/json',
-      },
+      headers: forwardedHeaders,
       body: JSON.stringify(req.body),
     });
 
@@ -34,23 +39,20 @@ app.post('/abacatepay', async (req, res) => {
   }
 });
 
-// ✅ Rota para checar status do PIX
-app.get('/abacatepay/v1/pixQrCode/check', async (req, res) => {
-  const { id } = req.query;
 
-  if (!id) {
+app.get('/abacatepay/v1/pixQrCode/check', async (req, res) => {
+  const { id, token } = req.query;
+
+  if (!id || !token) {
     return res.status(400).json({ error: 'ID da transação não informado' });
   }
 
-  if (!process.env.ABACATEPAY_TOKEN) {
-    return res.status(500).json({ error: 'Token da AbacatePay não configurado' });
-  }
 
   try {
     const response = await fetch(`https://api.abacatepay.com/v1/pixQrCode/check?id=${id}`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${process.env.ABACATEPAY_TOKEN}`,
+        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
     });
