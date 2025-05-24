@@ -43,7 +43,7 @@ app.post('/abacatepay', async (req, res) => {
 app.get('/abacatepay/v1/pixQrCode/check', async (req, res) => {
   const { id } = req.query;
 
-  if (!id || !token) {
+  if (!id) {
     return res.status(400).json({ error: 'ID da transação não informado' });
   }
   const forwardedHeaders = {
