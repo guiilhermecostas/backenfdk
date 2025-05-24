@@ -34,12 +34,15 @@ app.post('/abacatepay', async (req, res) => {
   }
 });
 
-// ✅ Rota para checar status do PIX
 app.get('/abacatepay/v1/pixQrCode/check', async (req, res) => {
   const { id } = req.query;
 
   if (!id) {
     return res.status(400).json({ error: 'ID da transação não informado' });
+  }
+
+  if (!process.env.ABACATEPAY_TOKEN) {
+    return res.status(500).json({ error: 'Token da AbacatePay não configurado' });
   }
 
   try {
@@ -51,14 +54,24 @@ app.get('/abacatepay/v1/pixQrCode/check', async (req, res) => {
       },
     });
 
+    const contentType = response.headers.get('content-type') || '';
+
+    // Proteção contra resposta malformada (HTML em vez de JSON)
+    if (!contentType.includes('application/json')) {
+      const text = await response.text(); // lê o HTML
+      console.error('❌ A API retornou HTML:', text.slice(0, 200));
+      return res.status(502).json({ error: 'Resposta inválida da AbacatePay', html: true });
+    }
+
     const result = await response.json();
-    res.status(response.status).json(result);
+
+    if (!response.ok) {
+      return res.status(502).json({ error: 'Erro da AbacatePay', detalhes: result });
+    }
+
+    res.json(result);
   } catch (err) {
-    console.error('Erro ao checar status na AbacatePay:', err);
+    console.error('Erro ao checar status na AbacatePay:', err.message || err);
     res.status(500).json({ error: 'Erro ao checar status do pagamento' });
   }
-});
-
-app.listen(PORT, () => {
-  console.log(`🚀 Backend rodando em http://localhost:${PORT}`);
 });
