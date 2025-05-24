@@ -58,20 +58,8 @@ app.get('/abacatepay/v1/pixQrCode/check', async (req, res) => {
       headers: forwardedHeaders,
     });
 
-    const contentType = response.headers.get('content-type') || '';
-
-    // Proteção contra resposta malformada (HTML em vez de JSON)
-    if (!contentType.includes('application/json')) {
-      const text = await response.text(); // lê o HTML
-      console.error('❌ A API retornou HTML:', text.slice(0, 200));
-      return res.status(502).json({ error: 'Resposta inválida da AbacatePay', html: true });
-    }
 
     const result = await response.json();
-
-    if (!response.ok) {
-      return res.status(502).json({ error: 'Erro da AbacatePay', detalhes: result });
-    }
 
     res.json(result);
   } catch (err) {
